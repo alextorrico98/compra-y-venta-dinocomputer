@@ -66,4 +66,58 @@ catch(error)
     }
 });
 module.exports=rutas;
-//FILTRAR POR ID
+//FILTRAR POR MARCA ESPECIFICA
+rutas.get('/productoPorMarca/:marca', async (req, res) => {
+    try {
+        const productos = await productoModel.find({ marca: req.params.marca });
+        return res.json(productos);
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
+// FILTRAR POR PALABRA EN DESCRIPCION
+rutas.get('/productosPorDescripcion/:palabra', async (req, res) => {
+    try {
+        const productos = await productoModel.find({ descripcion: { $regex: req.params.palabra, $options: 'i' } });
+        return res.json(productos);
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
+//CONTAR PRODUCTOS DE CADA MARCA
+rutas.get('/conteoProductosPorMarca', async (req, res) => {
+    try {
+        const conteo = await productoModel.aggregate([
+            { $group: { _id: "$marca", totalProductos: { $sum: 1 } } }
+        ]);
+        return res.json(conteo);
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
+//productos ordenados por cantidad
+rutas.get('/productosOrdenadosPorCantidad', async (req, res) => {
+    try {
+        const productos = await productoModel.find({}).sort({ cantidad: -1 });
+        return res.json(productos);
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
+//actualizar la cantidad por id
+rutas.put('/actualizarCantidad/:id/:cantidad', async (req, res) => {
+    try {
+        const productoActualizado = await productoModel.findByIdAndUpdate(
+            req.params.id,
+            { cantidad: req.params.cantidad },
+            { new: true }
+        );
+        if (!productoActualizado) {
+            return res.status(404).json({ mensaje: 'Producto no encontrado' });
+        } else {
+            return res.json(productoActualizado);
+        }
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
