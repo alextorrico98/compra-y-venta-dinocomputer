@@ -3,7 +3,6 @@ const mongoose=require('mongoose');
 const productoSchema= new mongoose.Schema({
     nombre:String,
     marca:String,
-    tipo:String,
     descripcion:String,
     cantidad: Number
 });

@@ -19,7 +19,6 @@ rutas.post('/crear',async (req,res)=>{
     const producto=new productoModel({
         nombre:req.body.nombre,
         marca:req.body.marca,
-        Tipo:req.body.tipo,
         descripcion:req.body.descripcion,
         cantidad:req.body.cantidad
     })
