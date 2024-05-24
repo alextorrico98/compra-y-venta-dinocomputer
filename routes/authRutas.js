@@ -27,11 +27,34 @@ rutas.post('/iniciarsesion', async (req,res) => {
         if (!validarContrasena)
             return res.status(401).json({ error : 'Contrasenia invalido!!!!!'});
         //creacion de token 
-        const token = jwt.sign({ usuarioId: usuario._id },'clave_secreta', {expiresIn: '3h'});
+        const token = jwt.sign({ usuarioId: usuario._id },'clave_secreta', {expiresIn: '2h'});
+        usuario.token = token;
+        await usuario.save();
         res.json( {token});
     }
     catch(error){
         res.status(500).json({mensaje: error.message});
+    }
+    
+});
+// Cerrar sesión
+rutas.post('/cerrarsesion', async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token)
+            return res.status(400).json({ mensaje: 'Token requerido' });
+
+        const decoded = jwt.verify(token, 'clave_secreta');
+        const usuario = await Usuario.findById(decoded.usuarioId);
+        if (!usuario)
+            return res.status(401).json({ mensaje: 'Usuario no encontrado' });
+
+        // Eliminar el token
+        usuario.token = null;
+        await usuario.save();
+        res.json({ mensaje: 'Sesión cerrada' });
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
     }
 });
 module.exports = rutas;
