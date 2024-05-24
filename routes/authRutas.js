@@ -19,7 +19,7 @@ rutas.get('/traerusuario', async (req,res)=>{
 rutas.post('/registro', async (req, res) => {
     try {
         const {user,correo,contra } = req.body;
-        const usuario = new Usuario({user,correo,contra});
+        const usuario = new usuarioModel({user,correo,contra});
         await usuario.save();
         res.status(201).json({mensaje: 'Usuario registrado'});
     }
@@ -32,7 +32,7 @@ rutas.post('/registro', async (req, res) => {
 rutas.post('/iniciarsesion', async (req,res) => {
     try {
         const { correo, contra } = req.body;
-        const usuario = await Usuario.findOne({ correo });
+        const usuario = await usuarioModel.findOne({ correo });
         if (!usuario)
             return res.status(401).json({ error : 'Correo invalido!!!!!'});
         const validarContrasena = await usuario.compararContrasenia(contra);
@@ -49,19 +49,4 @@ rutas.post('/iniciarsesion', async (req,res) => {
     }
     
 });
-// Cerrar sesión
-rutas.post('/cerrarsesion', async (req, res) => {
-    try {
-      const { usuarioId } = req.body;
-      const usuario = await Usuario.findById(usuarioId);
-      if (!usuario) {
-        return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-      }
-      usuario.token = null;
-      await usuario.save();
-      res.json({ mensaje: 'Sesión cerrada correctamente' });
-    } catch (error) {
-      res.status(500).json({ mensaje: error.message });
-    }
-  });
 module.exports = rutas;
