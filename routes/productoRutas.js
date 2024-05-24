@@ -20,7 +20,9 @@ rutas.post('/crear',async (req,res)=>{
         nombre:req.body.nombre,
         marca:req.body.marca,
         descripcion:req.body.descripcion,
-        cantidad:req.body.cantidad
+        cantidad:req.body.cantidad,
+        precio:req.body.precio,
+        idcategoria:req.body.idcategoria
     })
     try{
         const nuevoProducto=await producto.save();

@@ -1,9 +1,21 @@
 const express=require('express');
 const rutas=express.Router();
-const Usuario=require('../models/Usuarios');
+const usuarioModel=require('../models/Usuarios');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
+///mostrar usuario
+rutas.get('/traerusuario', async (req,res)=>{
+    try{
+       const usuario= await usuarioModel.find({});
+       res.json(usuario);
+    }
+    catch(error)
+    {
+        res.status(500).json({mensaje: error.mensaje});
+    }
+});
 //registro
+
 rutas.post('/registro', async (req, res) => {
     try {
         const {user,correo,contra } = req.body;
@@ -40,21 +52,16 @@ rutas.post('/iniciarsesion', async (req,res) => {
 // Cerrar sesión
 rutas.post('/cerrarsesion', async (req, res) => {
     try {
-        const { token } = req.body;
-        if (!token)
-            return res.status(400).json({ mensaje: 'Token requerido' });
-
-        const decoded = jwt.verify(token, 'clave_secreta');
-        const usuario = await Usuario.findById(decoded.usuarioId);
-        if (!usuario)
-            return res.status(401).json({ mensaje: 'Usuario no encontrado' });
-
-        // Eliminar el token
-        usuario.token = null;
-        await usuario.save();
-        res.json({ mensaje: 'Sesión cerrada' });
+      const { usuarioId } = req.body;
+      const usuario = await Usuario.findById(usuarioId);
+      if (!usuario) {
+        return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+      }
+      usuario.token = null;
+      await usuario.save();
+      res.json({ mensaje: 'Sesión cerrada correctamente' });
     } catch (error) {
-        res.status(500).json({ mensaje: error.message });
+      res.status(500).json({ mensaje: error.message });
     }
-});
+  });
 module.exports = rutas;

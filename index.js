@@ -9,7 +9,8 @@ const app=express();
 //rutas
 const productorutas= require('./routes/productoRutas');
 const categoriarutas= require('./routes/categoriaRutas');
-const clienterutas=require('./routes/clienterutas')
+const clienterutas=require('./routes/clienterutas');
+const ventarutas=require('./routes/ventarutas')
 //configuracion de environment
 const PORT= process.env.PORT || 3000;
 const MONGO_URI=process.env.MONGO_URI;
@@ -40,4 +41,5 @@ const autenticar = async (req, res, next)=>{
 app.use('/auth', authRutas);
 app.use('/producto',autenticar,productorutas);
 app.use('/categoria',categoriarutas);
-app.use('cliente',clienterutas);
+app.use('/cliente',clienterutas);
+app.use('/venta',ventarutas);
